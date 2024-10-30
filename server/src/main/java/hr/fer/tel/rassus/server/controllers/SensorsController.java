@@ -1,6 +1,7 @@
 package hr.fer.tel.rassus.server.controllers;
 
 
+import hr.fer.tel.rassus.server.beans.IdentifierDTO;
 import hr.fer.tel.rassus.server.beans.SensorDTO;
 import hr.fer.tel.rassus.server.services.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,20 +14,21 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sensors")
+@RequestMapping("/server")
 public class SensorsController {
 
     @Autowired
     private SensorService sensorService;
 
     //registracija
-    @PostMapping("/register")
+    @PostMapping("/registerSensor")
     public ResponseEntity<Void> registerSensor(@RequestBody SensorDTO sensorDTO) {
         String identifier = sensorService.register(sensorDTO);
 
         if(identifier != null) {
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("/sensors/"+identifier));
+            headers.setLocation(URI.create("http://localhost:3000/client/" + identifier));
+
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         }else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -34,12 +36,20 @@ public class SensorsController {
     }
 
     // popis senzora
-    @GetMapping("/getAll")
+    @GetMapping("/getAllSensors")
     public List<SensorDTO> getAllSensors() {
         List<SensorDTO> sensorDTOList = sensorService.getAll();
         return sensorDTOList;
     }
 
-    //  TODO 4.2  Najbliži susjed
+    @GetMapping("/findClosestNeighbour")
+    public ResponseEntity<SensorDTO> findClosestNeighbour(@RequestBody IdentifierDTO identifierDTO) {
+        SensorDTO closestNeighbour = sensorService.findClosestNeighbour(identifierDTO.getIdentifier());
+        if(closestNeighbour != null) {
+            return ResponseEntity.ok(closestNeighbour);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+    }
 
 }

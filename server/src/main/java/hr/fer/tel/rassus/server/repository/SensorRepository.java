@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface SensorRepository extends JpaRepository<SensorEntity, Long> {
     @Query("SELECT s FROM SensorEntity s WHERE s.identifier = :identifier")
-    SensorEntity findByIdentifier(@Param("identifier") Long identifier);
+    SensorEntity findByIdentifier(@Param("identifier") String identifier);
 
     @Query("SELECT s FROM SensorEntity s")
     List<SensorEntity> findAllSensors();
