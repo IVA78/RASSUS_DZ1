@@ -7,6 +7,9 @@ import hr.fer.tel.rassus.server.utils.IdentifierGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class SensorService {
 
@@ -28,6 +31,14 @@ public class SensorService {
             return null;
 
         }
+    }
+
+    public List<SensorDTO> getAll() {
+        List<SensorEntity> sensorEntityList = sensorRepository.findAll();
+        return sensorEntityList.stream().map(
+                sensorEntity -> new SensorDTO(sensorEntity.getLatitude(), sensorEntity.getLongitude(),sensorEntity.getIp(), sensorEntity.getPort())
+        ).collect(Collectors.toList());
+
     }
 
 }
