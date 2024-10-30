@@ -23,10 +23,10 @@ Svaki senzor radi kao zaseban proces s jedinstvenim portom i koordinatama te kom
 - **Logiranje i obrada grešaka**: Senzori i poslužitelj bilježe podatke i eventualne greške za lakše otklanjanje problema.
 - **Pohrana podataka**: Kalibrirana očitanja šalju se poslužitelju za daljnju obradu i pohranu.
 
-  ## Funkcionalnosti poslužitelja
-  - **Registracija senzora**: Omogućuje registraciju senzora i čuva njihove podatke, uključujući geografski položaj i trenutne očitanja.
-  - **Dohvaćanje najbližeg susjeda**: Poslužitelj izračunava najbliži senzor za klijenta koristeći Haversineovu formulu za geografske koordinate.
-  - **Pohrana i dohvaćanje očitanja**: Omogućuje pohranu i dohvaćanje senzorskih očitanja u JSON formatu.
+## Funkcionalnosti poslužitelja
+- **Registracija senzora**: Omogućuje registraciju senzora i čuva njihove podatke, uključujući geografski položaj i trenutne očitanja.
+- **Dohvaćanje najbližeg susjeda**: Poslužitelj izračunava najbliži senzor za klijenta koristeći Haversineovu formulu za geografske koordinate.
+- **Pohrana i dohvaćanje očitanja**: Omogućuje pohranu i dohvaćanje senzorskih očitanja u JSON formatu.
 
 ## Dodatne informacije
 - [gRPC dokumentacija](https://grpc.io/docs/)
