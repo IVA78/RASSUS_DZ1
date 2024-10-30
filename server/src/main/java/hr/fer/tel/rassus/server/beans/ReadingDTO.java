@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
  * methods for sensor operations.
  */
 public class ReadingDTO {
-  private String sensorIdentifier;
-  private LocalDateTime timestamp;
+
   private Integer temperature;
   private Integer pressure;
   private Integer humidity;
@@ -20,9 +19,7 @@ public class ReadingDTO {
     public ReadingDTO() {
     }
 
-    public ReadingDTO(String sensorIdentifier, LocalDateTime timestamp, Integer temperature, Integer pressure, Integer humidity, Integer co, Integer no2, Integer so2) {
-        this.sensorIdentifier = sensorIdentifier;
-        this.timestamp = timestamp;
+    public ReadingDTO( Integer temperature, Integer pressure, Integer humidity, Integer co, Integer no2, Integer so2) {
         this.temperature = temperature;
         this.pressure = pressure;
         this.humidity = humidity;
@@ -31,21 +28,7 @@ public class ReadingDTO {
         this.so2 = so2;
     }
 
-    public String getSensorIdentifier() {
-        return sensorIdentifier;
-    }
 
-    public void setSensorIdentifier(String sensorIdentifier) {
-        this.sensorIdentifier = sensorIdentifier;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
 
     public Integer getTemperature() {
         return temperature;

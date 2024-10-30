@@ -1,7 +1,6 @@
 package hr.fer.tel.rassus.server.controllers;
 
 
-import hr.fer.tel.rassus.server.beans.IdentifierDTO;
 import hr.fer.tel.rassus.server.beans.SensorDTO;
 import hr.fer.tel.rassus.server.services.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,10 @@ public class SensorsController {
         return sensorDTOList;
     }
 
-    @GetMapping("/findClosestNeighbour")
-    public ResponseEntity<SensorDTO> findClosestNeighbour(@RequestBody IdentifierDTO identifierDTO) {
-        SensorDTO closestNeighbour = sensorService.findClosestNeighbour(identifierDTO.getIdentifier());
+    //najblizi susjed
+    @GetMapping("/findClosestNeighbour/{identifier}")
+    public ResponseEntity<SensorDTO> findClosestNeighbour(@PathVariable("identifier") String identifier) {
+        SensorDTO closestNeighbour = sensorService.findClosestNeighbour(identifier);
         if(closestNeighbour != null) {
             return ResponseEntity.ok(closestNeighbour);
         } else {
