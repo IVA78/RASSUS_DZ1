@@ -13,7 +13,7 @@ public class SensorEntity {
     private Double latitude;
     @Column(name="longitude", nullable = false)
     private Double longitude;
-    @Column(name="ip", nullable = false, unique = true)
+    @Column(name="ip", nullable = false)
     private String ip;
     @Column(name="port", nullable = false)
     private Integer port;

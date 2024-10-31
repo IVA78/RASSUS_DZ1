@@ -26,7 +26,7 @@ public class SensorsController {
 
         if(identifier != null) {
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("http://localhost:3000/client/" + identifier));
+            headers.setLocation(URI.create(identifier));
 
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         }else {
