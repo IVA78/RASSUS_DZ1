@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 public class Application {
+    private static long startTime = System.nanoTime();
 
     private static final Logger logger = Logger.getLogger(Application.class.getName());
     private static String server_url = "http://localhost:8090";
@@ -29,6 +30,10 @@ public class Application {
 
     public static ReadingDTO getSensorReading() {
         return sensorReading;
+    }
+
+    public static long getStartTime() {
+        return startTime;
     }
 
     public static Boolean register(Double latitude, Double longitude, String ip, Integer port) {

@@ -1,5 +1,7 @@
 package hr.fer.tel.rassus.client.utils;
 
+import hr.fer.tel.rassus.client.Application;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,8 +19,10 @@ public class Utils {
             System.out.println("Failed to read CSV");
         }
 
-        Random random = new Random();
-        String randomLine = lines.get(random.nextInt(lines.size()+1));
+        Long elapsedTimeInNanos = System.nanoTime() - Application.getStartTime();
+        Long elapsedTimeInSeconds = elapsedTimeInNanos / 1000000000;
+        Long red = (elapsedTimeInSeconds % 100) + 1;
+        String randomLine = lines.get(red.intValue());
         /*
         System.out.println("Random line: " + randomLine);
         for(String s : randomLine.split(",")) {
