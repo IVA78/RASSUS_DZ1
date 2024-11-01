@@ -198,9 +198,23 @@ public class Application {
         System.out.println("Sensor is registered: " + registered);
         System.out.println("Identifier: " + identifier);
 
+        //prekiranje rada ako je registracija neuspješna
+        if(!registered){
+            return;
+        }
+
         //kreiranje gRPC servera
         final RPCServer server = new RPCServer(new RPCService(), port);
         server.start();
+
+        //generiranje ocitanja
+        sensorReading = Utils.parseReading();
+        logger.info("My reading:" + sensorReading.toString());
+
+
+        //trazenje informacija o najblizem susjedu za razmjenu ocitanja - NECE SE MIJENJATI TIJEKOM VREMENA
+        logger.info("Finding closest neighbour.");
+        SensorDTO neighbourSensor = findClosestNeighbour();
 
 
         while (true) {
@@ -209,10 +223,6 @@ public class Application {
             sensorReading = Utils.parseReading();
             logger.info("My reading:" + sensorReading.toString());
 
-
-            //trazenje informacija o najblizem susjedu za razmjenu ocitanja
-            logger.info("Finding closest neighbour.");
-            SensorDTO neighbourSensor = findClosestNeighbour();
 
             if (neighbourSensor != null) {
                 logger.info("Closest neighbour found!");

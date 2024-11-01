@@ -49,7 +49,7 @@ public class RPCClient {
             return new ReadingDTO(response.getTemperature(), response.getPressure(), response.getHumidity(), response.getCo(), response.getNo2(), response.getSo2());
 
         } catch (StatusRuntimeException e) {
-            logger.info("RPC failed: " + e.getMessage());
+            logger.info("This is exception, RPC failed: " + e.getMessage());
         }
 
         return null;
