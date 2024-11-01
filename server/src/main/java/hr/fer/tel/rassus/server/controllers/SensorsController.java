@@ -24,12 +24,12 @@ public class SensorsController {
     public ResponseEntity<Void> registerSensor(@RequestBody SensorDTO sensorDTO) {
         String identifier = sensorService.register(sensorDTO);
 
-        if(identifier != null) {
+        if (identifier != null) {
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create(identifier));
+            headers.setLocation(URI.create("http://" + sensorDTO.getIp() + ":" + sensorDTO.getPort() + "Identifier:" + identifier));
 
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
-        }else {
+        } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -45,7 +45,7 @@ public class SensorsController {
     @GetMapping("/findClosestNeighbour/{identifier}")
     public ResponseEntity<SensorDTO> findClosestNeighbour(@PathVariable("identifier") String identifier) {
         SensorDTO closestNeighbour = sensorService.findClosestNeighbour(identifier);
-        if(closestNeighbour != null) {
+        if (closestNeighbour != null) {
             return ResponseEntity.ok(closestNeighbour);
         } else {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
