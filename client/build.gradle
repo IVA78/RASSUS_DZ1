@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
+	id 'com.google.protobuf' version '0.9.4'
 	id 'idea'
-	id 'eclipse'
 }
 
 group 'hr.fer.rassus'
@@ -19,9 +19,48 @@ repositories {
 
 dependencies {
 	//################ GRPC ################
+	implementation 'io.grpc:grpc-netty-shaded:1.68.0'
+	implementation 'io.grpc:grpc-protobuf:1.68.0'
+	implementation 'io.grpc:grpc-services:1.68.0'
+	implementation 'io.grpc:grpc-stub:1.68.0'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+	implementation 'com.google.protobuf:protobuf-java:3.19.1'
+	implementation 'com.google.protobuf:protobuf-java-util:3.19.1'
+	implementation 'com.opencsv:opencsv:5.5.2'
 	compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
 	//################ GRPC ################
+}
+
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+sourceSets {
+	main {
+		// Remember to refresh gradle project in Eclipse (F5)
+		java {
+			srcDirs 'build/generated/source/proto/main/grpc'
+			srcDirs 'build/generated/source/proto/main/java'
+		}
+	}
+}
+
+//################ GRPC ################
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+protobuf {
+	protoc {
+		artifact = "com.google.protobuf:protoc:3.25.5"
+	}
+	plugins {
+		grpc {
+			artifact = 'io.grpc:protoc-gen-grpc-java:1.68.0'
+		}
+	}
+	generateProtoTasks {
+		all()*.plugins {
+			grpc {}
+		}
+		all().each {
+			it.group = 'build'
+		}
+	}
 }
 
 

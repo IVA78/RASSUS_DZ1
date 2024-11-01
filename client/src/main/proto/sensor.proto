@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "hr.fer.tel.rassus.client";
+
+package hr.fer.tel.rassus;
+
+service Sensor {
+  rpc requestReading(google.protobuf.Empty) returns (Reading) {}
+}
+
+message Reading{
+  int32  temperature = 1;
+  int32  pressure = 2;
+  int32  humidity = 3;
+  optional int32  co = 4 ;
+  optional int32  no2 = 5 ;
+  optional int32  so2 = 6 ;
+}
