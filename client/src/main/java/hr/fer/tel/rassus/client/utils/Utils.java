@@ -19,11 +19,13 @@ public class Utils {
 
         Random random = new Random();
         String randomLine = lines.get(random.nextInt(lines.size()+1));
+        /*
         System.out.println("Random line: " + randomLine);
         for(String s : randomLine.split(",")) {
             System.out.print("|"+s+"|");
         }
         System.out.println();
+         */
 
         int cnt = 0;
 

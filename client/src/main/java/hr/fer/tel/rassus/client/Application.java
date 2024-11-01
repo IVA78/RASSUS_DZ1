@@ -100,13 +100,13 @@ public class Application {
 
     public static Boolean saveReading(Integer temperature, Integer pressure, Integer humidity, Integer co, Integer no2, Integer so2) {
 
-        HashMap<String, Integer> readingMap= new HashMap<>();
+        HashMap<String, Integer> readingMap = new HashMap<>();
         readingMap.put("temperature", temperature);
         readingMap.put("pressure", pressure);
         readingMap.put("humidity", humidity);
         readingMap.put("co", co);
 
-        if(so2 != null) {
+        if (so2 != null) {
             readingMap.put("so2", so2);
         }
         if (no2 != null) {
@@ -129,7 +129,7 @@ public class Application {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Status code: " + response.statusCode());
+            //System.out.println("Status code: " + response.statusCode());
             if (response.statusCode() == 201) {
                 return true;
             } else {
@@ -139,6 +139,45 @@ public class Application {
             System.err.println("Error: " + e.getMessage());
             return false;
         }
+
+    }
+
+    public static ReadingDTO calibrateReading(ReadingDTO sensorReading, ReadingDTO rpcReading) {
+
+        ReadingDTO calibratedReading = new ReadingDTO();
+
+        Integer calibratedTemperature = (sensorReading.getTemperature() + rpcReading.getTemperature()) / 2;
+        Integer calibratedPressure = (sensorReading.getPressure() + rpcReading.getPressure()) / 2;
+        Integer calibratedHumidity = (sensorReading.getHumidity() + rpcReading.getHumidity()) / 2;
+        Integer calibratedCo = (sensorReading.getCo() + rpcReading.getCo()) / 2;
+
+        Integer calibratedNo2 = null;
+        if (sensorReading.getNo2() != null && sensorReading.getNo2() != 0 && rpcReading.getNo2() != null && rpcReading.getNo2() != 0 & rpcReading.getSo2() != -1) {
+            calibratedNo2 = (sensorReading.getNo2() + rpcReading.getNo2()) / 2;
+        } else if (sensorReading.getNo2() != null && sensorReading.getNo2() != 0) {
+            calibratedNo2 = sensorReading.getNo2();
+        } else if (rpcReading.getNo2() != null && rpcReading.getNo2() != 0 & rpcReading.getSo2() != -1) {
+            calibratedNo2 = rpcReading.getNo2();
+        }
+
+        Integer calibratedSo2 = null;
+        if (sensorReading.getSo2() != null && sensorReading.getSo2() != 0 && rpcReading.getSo2() != null && rpcReading.getSo2() != 0 && rpcReading.getSo2() != -1) {
+            calibratedSo2 = (sensorReading.getSo2() + rpcReading.getSo2()) / 2;
+        } else if (sensorReading.getSo2() != null && sensorReading.getSo2() != 0) {
+            calibratedSo2 = sensorReading.getSo2();
+        } else if (rpcReading.getSo2() != null && rpcReading.getSo2() != 0 & rpcReading.getSo2() != -1) {
+            calibratedSo2 = rpcReading.getSo2();
+        }
+
+        calibratedReading.setTemperature(calibratedTemperature);
+        calibratedReading.setPressure(calibratedPressure);
+        calibratedReading.setHumidity(calibratedHumidity);
+        calibratedReading.setCo(calibratedCo);
+        calibratedReading.setNo2(calibratedNo2);
+        calibratedReading.setSo2(calibratedSo2);
+
+
+        return calibratedReading;
 
     }
 
@@ -184,27 +223,23 @@ public class Application {
                     logger.info("RPC reading:" + rpcReading.toString());
 
                     //kalibracija rjesenja i slanje na posluzitelj
-
+                    ReadingDTO calibratedReading = calibrateReading(sensorReading, rpcReading);
+                    Boolean saved = saveReading(calibratedReading.getTemperature(), calibratedReading.getPressure(), calibratedReading.getHumidity(), calibratedReading.getCo(), calibratedReading.getNo2(), calibratedReading.getSo2());
+                    logger.info("Calibrated reading saved: " + saved);
 
 
                 } else {
-                    logger.info("Failed to get the reading.");
+                    logger.info("Failed to get the neighbour reading.");
+                    //slanje vlastitih ocitanja na posluzitelj
+                    Boolean saved = saveReading(sensorReading.getTemperature(), sensorReading.getPressure(), sensorReading.getHumidity(), sensorReading.getCo(), sensorReading.getNo2(), sensorReading.getSo2());
+                    logger.info("Sensor reading saved: " + saved);
                 }
-
-                //slanje vlastitih ocitanja na posluzitelj
-                Boolean saved = saveReading(sensorReading.getTemperature(), sensorReading.getPressure(), sensorReading.getHumidity(), sensorReading.getCo(), sensorReading.getNo2(), sensorReading.getSo2());
-                System.out.println("Reading saved: " + saved);
-
-
 
             } else {
                 logger.info("No closest neighbour found.");
                 //slanje vlastitih ocitanja na posluzitelj
-                //slanje vlastitih ocitanja na posluzitelj
                 Boolean saved = saveReading(sensorReading.getTemperature(), sensorReading.getPressure(), sensorReading.getHumidity(), sensorReading.getCo(), sensorReading.getNo2(), sensorReading.getSo2());
-                System.out.println("Reading saved: " + saved);
-
-
+                logger.info("Sensor reading saved: " + saved);
 
             }
 

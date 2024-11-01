@@ -30,7 +30,7 @@ public class RPCService extends SensorGrpc.SensorImplBase {
 
         responseObserver.onNext(response);
 
-        logger.info("Responding with: " + readingDTO.toString());
+        logger.info("Responding with: " + response.getTemperature() + ", " + response.getPressure() + ", " + response.getHumidity() + ", " + response.getCo() + ", " + response.getNo2() + ", " + response.getSo2());
         // Send a notification of successful stream completion.
         responseObserver.onCompleted();
 
