@@ -1,5 +1,7 @@
 package hr.fer.tel.rassus.server.beans;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.LocalDateTime;
 
 /**
@@ -7,6 +9,7 @@ import java.time.LocalDateTime;
  * It contains reading-related information and provides
  * methods for sensor operations.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReadingDTO {
 
   private Integer temperature;

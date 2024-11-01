@@ -13,11 +13,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class Application {
 
+    private static final Logger logger = Logger.getLogger(Application.class.getName());
     private static String server_url = "http://localhost:8090";
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static HttpClient client = HttpClient.newHttpClient();
@@ -41,7 +44,7 @@ public class Application {
         try {
             json = objectMapper.writeValueAsString(requestBody);
         } catch (Exception e) {
-            throw new RuntimeException("Pogreška pri serijaliziranju zahtjeva u JSON format!");
+            throw new RuntimeException("Error in serialization with JSON format!");
         }
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -52,15 +55,15 @@ public class Application {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Statusni kod: " + response.statusCode());
+            System.out.println("Status code: " + response.statusCode());
             if (response.statusCode() == 201) {
                 identifier = response.headers().firstValue("Location").orElse(null);
                 return identifier != null;
             } else {
-                throw new RuntimeException("Neuspješna registracija, statusni kod: " + response.statusCode());
+                throw new RuntimeException("Filed to register, status code: " + response.statusCode());
             }
         } catch (Exception e) {
-            System.err.println("Pogreška: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
             return false;
         }
 
@@ -75,7 +78,6 @@ public class Application {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Status code: " + response.statusCode());
 
             if (response.statusCode() == 200) {
                 // If the response is 200, parse the body as SensorDTO
@@ -96,6 +98,50 @@ public class Application {
 
     }
 
+    public static Boolean saveReading(Integer temperature, Integer pressure, Integer humidity, Integer co, Integer no2, Integer so2) {
+
+        HashMap<String, Integer> readingMap= new HashMap<>();
+        readingMap.put("temperature", temperature);
+        readingMap.put("pressure", pressure);
+        readingMap.put("humidity", humidity);
+        readingMap.put("co", co);
+
+        if(so2 != null) {
+            readingMap.put("so2", so2);
+        }
+        if (no2 != null) {
+            readingMap.put("no2", no2);
+        }
+
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(readingMap);
+        } catch (Exception e) {
+            throw new RuntimeException("Error in serialization with JSON format!");
+        }
+
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(server_url + "/readings/saveReading/" + identifier))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("Status code: " + response.statusCode());
+            if (response.statusCode() == 201) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            return false;
+        }
+
+    }
+
 
     public static void main(String[] args) {
 
@@ -108,43 +154,65 @@ public class Application {
         System.out.println("Sensor is registered: " + registered);
         System.out.println("Identifier: " + identifier);
 
-        //generiranje ocitanja
-        sensorReading = Utils.parseReading();
-        System.out.println("My reading:" + sensorReading.toString());
-
         //kreiranje gRPC servera
         final RPCServer server = new RPCServer(new RPCService(), port);
         server.start();
-        //server.blockUntilShutdown();
 
 
         while (true) {
 
+            //generiranje ocitanja
+            sensorReading = Utils.parseReading();
+            logger.info("My reading:" + sensorReading.toString());
+
 
             //trazenje informacija o najblizem susjedu za razmjenu ocitanja
+            logger.info("Finding closest neighbour.");
             SensorDTO neighbourSensor = findClosestNeighbour();
 
             if (neighbourSensor != null) {
-                System.out.println("Neighbour sensor: " + neighbourSensor.getLatitude() + ", " + neighbourSensor.getLongitude() + ", " + neighbourSensor.getIp() + ", " + neighbourSensor.getPort());
+                logger.info("Closest neighbour found!");
+                logger.info("Neighbour sensor: " + neighbourSensor.getLatitude() + ", " + neighbourSensor.getLongitude() + ", " + neighbourSensor.getIp() + ", " + neighbourSensor.getPort());
+
                 //kreiranje gRPC klijenta
+                logger.info("Creating RPC client.");
                 RPCClient client = new RPCClient(neighbourSensor.getIp(), neighbourSensor.getPort());
 
+                logger.info("Sending reading request to closest neighbour");
                 ReadingDTO rpcReading = client.requestReading();
                 if (rpcReading != null) {
-                    System.out.println("RPC reading:" + rpcReading.toString());
+                    logger.info("RPC reading:" + rpcReading.toString());
+
+                    //kalibracija rjesenja i slanje na posluzitelj
+
+
+
                 } else {
-                    System.out.println("Filed to get the reading.");
+                    logger.info("Failed to get the reading.");
                 }
 
+                //slanje vlastitih ocitanja na posluzitelj
+                Boolean saved = saveReading(sensorReading.getTemperature(), sensorReading.getPressure(), sensorReading.getHumidity(), sensorReading.getCo(), sensorReading.getNo2(), sensorReading.getSo2());
+                System.out.println("Reading saved: " + saved);
+
+
+
             } else {
-                System.out.println("No closest neighbour");
+                logger.info("No closest neighbour found.");
+                //slanje vlastitih ocitanja na posluzitelj
+                //slanje vlastitih ocitanja na posluzitelj
+                Boolean saved = saveReading(sensorReading.getTemperature(), sensorReading.getPressure(), sensorReading.getHumidity(), sensorReading.getCo(), sensorReading.getNo2(), sensorReading.getSo2());
+                System.out.println("Reading saved: " + saved);
+
+
+
             }
 
-          try {
-            Thread.sleep(5000);
-          } catch (InterruptedException e) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
 
-          }
+            }
 
         }
 
