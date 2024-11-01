@@ -26,7 +26,7 @@ public class ReadingController {
 
         if(saved) {
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("ReadingSaved.Identifier:"+ sensorIdentifier));
+            headers.setLocation(URI.create("ReadingSaved."));
 
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
 

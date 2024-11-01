@@ -26,7 +26,7 @@ public class SensorsController {
 
         if (identifier != null) {
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("http://" + sensorDTO.getIp() + ":" + sensorDTO.getPort() + "Identifier:" + identifier));
+            headers.setLocation(URI.create(identifier));
 
             return new ResponseEntity<>(headers, HttpStatus.CREATED);
         } else {
